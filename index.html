@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="ltr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -911,28 +911,52 @@
     // initialize once
     applyTypography();
 
-    // ------------------------------
-    // Photo upload (offline preview)
-    // ------------------------------
-    const photoInput = document.getElementById('photoInput');
-    const avatarImg = document.getElementById('avatarImg');
-    const avatarPlaceholder = document.getElementById('avatarPlaceholder');
-    const avatar = document.getElementById('avatar');
+  // ------------------------------
+  // Photo upload (offline preview) + EMBED AS BASE64
+  // ------------------------------
+  const photoInput = document.getElementById('photoInput');
+  const avatarImg = document.getElementById('avatarImg');
+  const avatarPlaceholder = document.getElementById('avatarPlaceholder');
+  const avatar = document.getElementById('avatar');
 
-    // Clicking the avatar opens file picker
-    avatar.addEventListener('click', () => {
+  // We'll store the base64 here so export will include it
+  let embeddedPhotoDataURL = "";
+
+  // Clicking the avatar opens file picker
+  avatar.addEventListener('click', () => {
     photoInput.click();
-    });
+  });
 
-    photoInput.addEventListener('change', () => {
-      const file = photoInput.files?.[0];
-      if(!file) return;
+  photoInput.addEventListener('change', () => {
+    const file = photoInput.files?.[0];
+    if (!file) return;
 
-      const url = URL.createObjectURL(file);
-      avatarImg.src = url;
+    const reader = new FileReader();
+    reader.onload = () => {
+      embeddedPhotoDataURL = String(reader.result || "");
+      avatarImg.src = embeddedPhotoDataURL;
+
       avatarImg.style.display = 'block';
       avatarPlaceholder.style.display = 'none';
-    });
+
+      // Optional: persist between refreshes (may or may not work on file:// across browsers)
+      try { localStorage.setItem('cv_avatar_base64', embeddedPhotoDataURL); } catch (e) {}
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Optional: restore on reload
+  (function restorePhoto(){
+    try {
+      const saved = localStorage.getItem('cv_avatar_base64');
+      if(saved){
+        embeddedPhotoDataURL = saved;
+        avatarImg.src = saved;
+        avatarImg.style.display = 'block';
+        avatarPlaceholder.style.display = 'none';
+      }
+    } catch(e){}
+  })();
 
     // ------------------------------
     // Language dots: click to set level
@@ -1043,19 +1067,37 @@
     const exportBtn = document.getElementById('exportBtn');
 
     exportBtn.addEventListener('click', () => {
-      // Create a downloadable snapshot of the current DOM (client-side).
-      // Note: uploaded photo via objectURL won't embed as base64 automatically.
-      // If you need embedded image, tell me and I will add "embed as base64" option.
-      const html = "<!doctype html>\n" + document.documentElement.outerHTML;
-      const blob = new Blob([html], {type: "text/html;charset=utf-8"});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = "europass_offline_cv.html";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    });
+  // Clone the document so we can safely tweak the snapshot
+  const clone = document.documentElement.cloneNode(true);
+
+  // If the avatar is currently visible, force-embed its src into the clone
+  const cloneImg = clone.querySelector('#avatarImg');
+  const clonePlaceholder = clone.querySelector('#avatarPlaceholder');
+
+  if (cloneImg) {
+    const currentSrc = avatarImg?.src || '';
+    if (currentSrc.startsWith('data:image/')) {
+      cloneImg.setAttribute('src', currentSrc);
+      cloneImg.style.display = 'block';
+      if (clonePlaceholder) clonePlaceholder.style.display = 'none';
+    } else {
+      // No embedded image => keep placeholder
+      cloneImg.removeAttribute('src');
+      cloneImg.style.display = 'none';
+      if (clonePlaceholder) clonePlaceholder.style.display = 'block';
+    }
+  }
+
+  const html = "<!doctype html>\n" + clone.outerHTML;
+  const blob = new Blob([html], {type: "text/html;charset=utf-8"});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = "europass_offline_cv.html";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+});
+
   </script>
 </body>
 </html>
-
