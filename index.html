@@ -1,0 +1,1060 @@
+<!doctype html>
+<html lang="ar" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Europass CV Builder</title>
+<link rel="apple-touch-icon" sizes="180x180" href="https://ju-it-aqaba.github.io/ju-it-aqaba.com/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://ju-it-aqaba.github.io/ju-it-aqaba.com/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://ju-it-aqaba.github.io/ju-it-aqaba.com/favicon-16x16.png">
+  <link rel="shortcut icon" href="https://ju-it-aqaba.github.io/ju-it-aqaba.com/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    /* ------------------------------
+       THEME VARIABLES (editable)
+    --------------------------------*/
+    :root{
+      /* Curved caps (visible on screen + print) */
+      --capTop:   #2f5b7f;   /* Top band color (dark gray/blue) */
+      --capBottom:#2f5b7f;   /* Bottom band color */
+      --capTopH: 210px;       /* Top band height */
+      --capBottomH: 150px;   /* Bottom band height */
+      --curveW: 320px;       /* Curve width */
+      --curveH: 110px;       /* Curve height */
+
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      --base: 14px;          /* base font size */
+      --lh: 1.55;            /* base line-height */
+      --nameSize: 28px;      /* name heading size */
+      --sectionSize: 20px;   /* section title size */
+      --radius: 18px;
+      --sidebar: #ccd4db;      /* left column background */
+      --accent:  #2f5b7f;      /* headings / lines */
+      --text:    #1d2430;      /* main text */
+      --muted:   #6b7485;      /* secondary text */
+      --paper:   #ffffff;      /* page background */
+      --border:  #e6e9ef;      /* separators */
+      --chip:    rgba(255,255,255,.14);
+      --radius:  18px;
+      --shadow:  0 10px 30px rgba(0,0,0,.10);
+          }
+
+    /* ------------------------------
+       PAGE SIZE CONTROL
+       (we will toggle these classes)
+    --------------------------------*/
+    .paper.a4 { width: 210mm; min-height: 297mm; }
+    .paper.a3 { width: 297mm; min-height: 420mm; }
+
+    /* ------------------------------
+       BASE LAYOUT
+    --------------------------------*/
+    *{ box-sizing: border-box; }
+    body{
+      margin: 0;
+      font-family: var(--font);
+      font-size: var(--base);
+      line-height: var(--lh);
+      color: var(--text);
+      color: var(--text);
+      background: #f3f6fb;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Top control bar (NOT printed) */
+    .toolbar{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 14px;
+    }
+    .toolbar .row{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .group{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .btn, .select, .input, .color{
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 0 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn.primary{
+      border-color: transparent;
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn.danger{
+      border-color: #ffd0d0;
+      background: #fff5f5;
+      color: #c81d25;
+    }
+    .color{
+      padding: 0;
+      width: 44px;
+    }
+    .hint{
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Document (printed area) */
+    .wrap{
+      display: flex;
+      justify-content: center;
+      padding: 18px;
+    }
+    .paper{
+      background: var(--paper);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: visible;
+      border: 1px solid var(--border);
+    }
+
+    .cv{
+      display: grid;
+      grid-template-columns: 34% 66%;
+      min-height: 100%;
+    }
+
+    /* Left column */
+    /* Left column (Europass-like) */
+.left{
+  position: relative;
+  background: var(--sidebar);
+  color: var(--text);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  /* match page rounding */
+  border-top-left-radius: var(--radius);
+  border-bottom-left-radius: var(--radius);
+  overflow: hidden;
+
+  /* subtle separator like the screenshot */
+  border-right: 1px solid var(--border);
+}
+
+/* keep content above the decorative shapes */
+.left > *{
+  position: relative;
+  z-index: 2;
+}
+
+/* TOP blue cap with curved bottom cut-out */
+.left::before{
+  content:"";
+  position:absolute;
+  top:0; left:0; right:0;
+  height: var(--capTopH);
+  z-index: 1;
+
+  background:
+    radial-gradient(
+      ellipse var(--curveW) var(--curveH) at 50% 100%,
+      var(--sidebar) 99%,
+      transparent 100%
+    ),
+    linear-gradient(var(--capTop), var(--capTop));
+
+  border-top-left-radius: var(--radius);
+}
+
+.left::after{
+  content:"";
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height: var(--capBottomH);
+  z-index: 1;
+
+  background:
+    radial-gradient(
+      ellipse var(--curveW) var(--curveH) at 50% 0%,
+      var(--sidebar) 99%,
+      transparent 100%
+    ),
+    linear-gradient(var(--capBottom), var(--capBottom));
+
+  border-bottom-left-radius: var(--radius);
+}
+
+
+    .avatarWrap{
+  display: grid;
+  grid-template-columns: 1fr;
+  place-items: center;
+  gap: 10px;
+
+  /* push it down so it sits in the white area under the top cap */
+  padding-top: 82px;
+}
+
+.avatar{
+  width: 140px;
+  height: 140px;
+  border-radius: 999px;
+  border: 6px solid #fff;
+  overflow: hidden;
+
+  /* slight shadow like screenshot */
+  box-shadow: 0 8px 20px rgba(0,0,0,.12);
+
+  background: #fff;
+  display: grid;
+  place-items: center;
+
+  cursor: pointer;
+}
+
+.avatar img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.avatar .placeholder{
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 10px;
+  line-height: 1.25;
+}
+
+
+   .leftCard{
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+.leftTitle{
+  font-weight: 900;
+  letter-spacing: .2px;
+  margin: 0 0 10px;
+  font-size: 18px;
+  color: var(--accent); /* Blue titles like the reference */
+
+}
+
+    .kv{
+      display: grid;
+      gap: 8px;
+      font-size: 14px;
+    }
+    .kv .item{
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 8px;
+      align-items: start;
+    }
+    /* Accent-colored icons (replaces emojis) */
+    .kv .ico{
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);         
+    }
+
+    .kv .ico svg{
+      width: 18px;
+      height: 18px;
+      display: block;
+      fill: currentColor;           
+    }
+
+    .ico{ opacity: .95; }
+    .muted{ opacity: .9; }
+
+    .langRow{
+      display: grid;
+      gap: 10px;
+    }
+    .lang{
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .dots{
+      display: inline-flex;
+      gap: 4px;
+    }
+   .dot{
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(47,91,127,.18); /* Light gray */
+  border: 1px solid rgba(47,91,127,.18);
+}
+.dot.on{
+  background: var(--accent);       /* Accent color */
+  border-color: var(--accent);
+}
+
+
+    /* Right column */
+    .right{
+      padding: 22px 24px;
+    }
+
+    .header{
+      display: grid;
+      gap: 8px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 14px;
+    }
+
+    .name{
+
+      font-size: var(--nameSize);
+      font-weight: 900;
+      line-height: 1.1;
+    }
+    .tagline{
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .section{
+      padding: 12px 0 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section:last-child{ border-bottom: none; }
+
+    .sectionHead{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .sectionTitle{
+      font-size: var(--sectionSize); 
+      font-weight: 900;
+      color: var(--accent);
+      margin: 0;
+    }
+
+    .sectionTools{
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .avatar{
+    cursor: pointer;
+    }
+    .avatar:hover{
+    outline: 3px solid rgba(255,255,255,.25);
+    outline-offset: 4px;
+    }
+
+    .mini{
+      height: 30px;
+      padding: 0 10px;
+      font-size: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .entry{
+      display: grid;
+      gap: 4px;
+      padding: 10px 0;
+    }
+    .entryTop{
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: baseline;
+    }
+    .entryTitle{
+      font-weight: 800;
+      font-size: 16px;
+    }
+    .entryMeta{
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .entrySub{
+      color: var(--muted);
+      font-size: 13px;
+    }
+   .entryBody{
+      font-size: var(--base);
+      line-height: var(--lh);
+    }
+
+
+    /* Editable fields */
+    [contenteditable="true"]{
+      outline: none;
+      border-radius: 8px;
+      padding: 2px 4px;
+      transition: background .15s ease, box-shadow .15s ease;
+    }
+    [contenteditable="true"]:hover{
+      background: rgba(47,91,127,.06);
+    }
+    [contenteditable="true"]:focus{
+      background: rgba(47,91,127,.10);
+      box-shadow: 0 0 0 2px rgba(47,91,127,.20);
+    }
+
+    /* Utility */
+    .small{
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ------------------------------
+       PRINT STYLES (A4 / A3)
+    --------------------------------*/
+    .paper{ height: auto; }
+    .paper{ overflow: visible; }
+
+@media print{
+  /* Hide toolbar/tools */
+  .toolbar{ display: none !important; }
+
+  /* Remove outer padding/margins */
+  html, body{
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  .wrap{
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Important: print edge-to-edge */
+  @page{
+    margin: 0mm;          /* No white margins */
+    /* Size will be injected via JS below */
+  }
+
+  /* Disable page corner rounding in print only */
+  .paper{
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Disable corner rounding on paper during print only */
+  .paper { border-radius: 0 !important; }
+
+  /* Left column used to inherit rounding from radius */
+  .left{
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+  }
+
+  /* Even decorative shapes (top/bottom caps) should not round corners */
+  .left::before,
+  .left::after{
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  .no-print{
+  display: none !important;
+  visibility: hidden !important;
+  }
+    .sectionTools,
+    .mini,
+    .btn{
+    display: none !important;
+    }
+
+  /* Prevent weird browser scaling */
+  .cv{ min-height: 100% !important; }
+
+  /* Print colors */
+  .left{
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+ /* Avoid breaking elements across pages */
+  .section, .entry{
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+ /* Remove hover/focus effects */
+  [contenteditable="true"]:hover,
+  [contenteditable="true"]:focus{
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}
+
+    /* We'll override @page size in JS by injecting a style tag */
+  </style>
+</head>
+
+<body>
+  <!-- TOOLBAR (OFFLINE CONTROLS) -->
+  <div class="toolbar">
+    <div class="row">
+      <div class="group">
+        <label class="hint">Paper:</label>
+        <select id="paperSize" class="select">
+          <option value="a4">A4 (210×297mm)</option>
+          <option value="a3">A3 (297×420mm)</option>
+        </select>
+
+        <button class="btn primary" id="printBtn">Print</button>
+        <button class="btn" id="exportBtn" title="Saves an offline HTML copy of the CV (no server)">Export HTML</button>
+      </div>
+
+      <div class="group">
+        <label class="hint">Sidebar</label>
+        <input id="sidebarColor" class="color" type="color" value="#ccd4db"/>
+
+        <label class="hint">Accent</label>
+        <input id="accentColor" class="color" type="color" value="#2f5b7f"/>
+
+        <label class="hint">Text</label>
+        <input id="textColor" class="color" type="color" value="#1d2430"/>
+        <label class="hint">Cap Top</label>
+        <input id="capTopColor" class="color" type="color" value="#7e848a"/>
+        <label class="hint">Cap Bottom</label>
+        <input id="capBottomColor" class="color" type="color" value="#2f5b7f"/>
+
+        <label class="hint">Font</label>
+        <select id="fontFamily" class="select">
+        <option value='system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif'>System</option>
+        <option value='"Segoe UI", Tahoma, Arial, sans-serif'>Segoe UI</option>
+        <option value='Arial, "Helvetica Neue", sans-serif'>Arial</option>
+        <option value='"Times New Roman", Times, serif' selected>Times New Roman</option>
+        <option value='Georgia, serif'>Georgia</option>
+        <option value='"Courier New", Courier, monospace'>Courier New</option>
+        </select>
+
+        <label class="hint">Size</label>
+        <input id="fontSize" class="input" type="number" min="10" max="20" value="14" style="width:74px"/>
+
+        <label class="hint">Line</label>
+        <input id="lineHeight" class="input" type="number" min="1.1" max="2.2" step="0.05" value="1.55" style="width:84px"/>
+
+        <label class="hint">Head</label>
+        <input id="headingScale" class="input" type="number" min="0.8" max="1.4" step="0.05" value="1" style="width:84px"/>
+
+        <button class="btn" id="resetTypographyBtn" title="Restore default font">Reset Font</button>
+
+        <button class="btn" id="addSectionBtn">+ Add Section</button>
+        <button class="btn danger" id="resetBtn" title="Reset default colors">Reset Colors</button>
+      </div>
+    </div>
+    <div class="hint" style="margin-top:6px">
+     This Webpage Developed by Yousef Khaled - Offline Europass CV Builder - A4/A3 - January 2026
+    </div>
+  </div>
+
+  <div class="wrap">
+    <!-- PAPER -->
+    <div id="paper" class="paper a4">
+      <div class="cv">
+        <!-- LEFT -->
+        <aside class="left">
+          <div class="avatarWrap">
+            <div class="avatar" id="avatar" title="Click to upload photo">
+        <img id="avatarImg" alt="Profile photo" />
+        <div class="placeholder" id="avatarPlaceholder">
+            Click to upload<br/> (offline)
+        </div>
+        </div>
+
+
+              <div class="kv">
+                <div class="item">
+                  <div>
+                    <input class="input" type="file" id="photoInput" accept="image/*" hidden />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="leftCard">
+            <h3 class="leftTitle">Personal details</h3>
+            <div class="kv">
+              <div class="item">
+              <span class="ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
+                </svg>
+              </span>
+                <div contenteditable="true">Yousef Khaled</div>
+              </div>
+              <div class="item">
+                <span class="ico" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 3 3 10v11h6v-7h6v7h6V10l-9-7Z"/>
+                  </svg>
+                </span>
+                <div contenteditable="true">Aqaba, Jordan</div>
+              </div>
+              <div class="item">
+              <span class="ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M10.6 13.4a1 1 0 0 0 1.4 1.4l3.8-3.8a3 3 0 1 0-4.2-4.2L9.8 8.6a1 1 0 1 0 1.4 1.4l1.8-1.8a1 1 0 1 1 1.4 1.4l-3.8 3.8ZM13.4 10.6a1 1 0 0 0-1.4-1.4l-3.8 3.8a3 3 0 1 0 4.2 4.2l1.8-1.8a1 1 0 1 0-1.4-1.4l-1.8 1.8a1 1 0 1 1-1.4-1.4l3.8-3.8Z"/>
+                </svg>
+              </span>
+                <div contenteditable="true">linkedin.com/in/yousef-abdelhadi-123164255</div>
+              </div>
+              <div class="item">
+                <span class="ico" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                  </svg>
+                </span>
+                <div contenteditable="true">your.email@example.com</div>
+              </div>
+              <div class="item">
+              <span class="ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M6.6 10.8c1.2 2.3 3.1 4.2 5.4 5.4l1.8-1.8a1 1 0 0 1 1-.24c1.1.36 2.3.55 3.5.55a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.6 21 3 13.4 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.2.19 2.4.55 3.5a1 1 0 0 1-.24 1l-1.8 1.8Z"/>
+                </svg>
+              </span>
+                <div contenteditable="true">+962 7X XXX XXXX</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="leftCard">
+            <h3 class="leftTitle">Languages</h3>
+
+            <div class="langRow" id="languages">
+              <!-- Language item -->
+              <div class="lang">
+                <div contenteditable="true">English</div>
+                <div class="dots" data-level="4" title="click dots to change level">
+                  <span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span>
+                </div>
+              </div>
+
+              <div class="lang">
+                <div contenteditable="true">German</div>
+                <div class="dots" data-level="2" title="click dots to change level">
+                  <span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
+            <button class="mini no-print" id="addLangBtn">+ Add language</button>
+            <button class="mini no-print" id="removeLangBtn">- Remove last</button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- RIGHT -->
+        <main class="right">
+          <div class="header">
+            <div class="name" contenteditable="true">Profile</div>
+            <div class="tagline" contenteditable="true">
+              Write a short professional summary here (2–4 lines). Example: BIT student & Flutter/Firebase developer focused on mobile systems and secure cloud solutions.
+            </div>
+          </div>
+
+          <!-- SECTION: EDUCATION -->
+          <section class="section" data-section>
+            <div class="sectionHead">
+              <h2 class="sectionTitle" contenteditable="true">Education</h2>
+              <div class="sectionTools">
+                <button class="mini addEntryBtn no-print">+ Add item</button>
+                <button class="mini removeSectionBtn no-print" title="Remove this section">Remove</button>
+              </div>
+            </div>
+
+            <div class="entries">
+              <article class="entry" data-entry>
+                <div class="entryTop">
+                  <div class="entryTitle" contenteditable="true">Bachelor of BIT, Business Information Technology</div>
+                  <div class="entryMeta" contenteditable="true">Jan 2022 – Dec 2025</div>
+                </div>
+                <div class="entrySub" contenteditable="true">University of Jordan</div>
+                <div class="entryBody" contenteditable="true">
+                  Optional details: GPA, key courses, achievements, graduation project title, etc.
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <!-- SECTION: CERTIFICATES -->
+          <section class="section" data-section>
+            <div class="sectionHead">
+              <h2 class="sectionTitle" contenteditable="true">Certificates</h2>
+              <div class="sectionTools">
+                <button class="mini addEntryBtn no-print">+ Add item</button>
+                <button class="mini removeSectionBtn no-print" title="Remove this section">Remove</button>
+              </div>
+            </div>
+
+            <div class="entries">
+              <article class="entry" data-entry>
+                <div class="entryTop">
+                  <div class="entryTitle" contenteditable="true">Fundamentals of Digital Marketing</div>
+                  <div class="entryMeta" contenteditable="true">Jan 2024</div>
+                </div>
+                <div class="entrySub" contenteditable="true">Google / Platform name</div>
+                <div class="entryBody" contenteditable="true">
+                  Optional: what you learned, credential ID, link, etc.
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <!-- SECTION: EXPERIENCE (example) -->
+          <section class="section" data-section>
+            <div class="sectionHead">
+              <h2 class="sectionTitle" contenteditable="true">Experience</h2>
+              <div class="sectionTools">
+                    <button class="mini addEntryBtn no-print">+ Add item</button>
+                    <button class="mini removeSectionBtn no-print" title="Remove this section">Remove</button>
+              </div>
+            </div>
+
+            <div class="entries">
+              <article class="entry" data-entry>
+                <div class="entryTop">
+                  <div class="entryTitle" contenteditable="true">Mobile Developer (Intern)</div>
+                  <div class="entryMeta" contenteditable="true">Jun 2025 – Aug 2025</div>
+                </div>
+                <div class="entrySub" contenteditable="true">Company name • Aqaba</div>
+                <div class="entryBody" contenteditable="true">
+                  • Bullet 1<br/>
+                  • Bullet 2<br/>
+                  • Bullet 3
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <!-- SECTION: SKILLS (example) -->
+          <section class="section" data-section>
+            <div class="sectionHead">
+              <h2 class="sectionTitle" contenteditable="true">Skills</h2>
+              <div class="sectionTools">
+                <button class="mini addEntryBtn no-print">+ Add item</button>
+                <button class="mini removeSectionBtn no-print" title="Remove this section">Remove</button>
+              </div>
+            </div>
+
+            <div class="entries">
+              <article class="entry" data-entry>
+                <div class="entryTop">
+                  <div class="entryTitle" contenteditable="true">Flutter • Firebase • Git • REST APIs</div>
+                  <div class="entryMeta" contenteditable="true">Core</div>
+                </div>
+                <div class="entryBody" contenteditable="true">
+                  Add more skills, tools, frameworks, soft skills, etc.
+                </div>
+              </article>
+            </div>
+          </section>
+
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ------------------------------
+    // Paper size + print @page
+    // ------------------------------
+    const paper = document.getElementById('paper');
+    const paperSize = document.getElementById('paperSize');
+    const printBtn = document.getElementById('printBtn');
+
+    // We'll inject @page size dynamically so printing is correct.
+    const pageStyle = document.createElement('style');
+    document.head.appendChild(pageStyle);
+
+    function applyPaperSize(size){
+      paper.classList.remove('a4','a3');
+      paper.classList.add(size);
+
+      // @page size must match selection
+      const pageRule = size === 'a3'
+        ? '@page { size: A3; margin: 0mm; }'
+        : '@page { size: A4; margin: 0mm; }';
+
+      pageStyle.textContent = pageRule;
+    }
+
+    paperSize.addEventListener('change', () => applyPaperSize(paperSize.value));
+    applyPaperSize(paperSize.value);
+
+    printBtn.addEventListener('click', () => {
+    applyPaperSize(paperSize.value); // ensure correct @page
+    window.print();
+    });
+
+    // ------------------------------
+    // Theme colors
+    // ------------------------------
+    const sidebarColor = document.getElementById('sidebarColor');
+    const accentColor  = document.getElementById('accentColor');
+    const textColor    = document.getElementById('textColor');
+    const resetBtn     = document.getElementById('resetBtn');
+    const capTopColor = document.getElementById('capTopColor');
+    const capBottomColor = document.getElementById('capBottomColor');
+
+    capTopColor.addEventListener('input', e => setVar('--capTop', e.target.value));
+    capBottomColor.addEventListener('input', e => setVar('--capBottom', e.target.value));
+
+    function setVar(name, value){
+      document.documentElement.style.setProperty(name, value);
+    }
+
+    sidebarColor.addEventListener('input', e => setVar('--sidebar', e.target.value));
+    accentColor.addEventListener('input',  e => setVar('--accent', e.target.value));
+    textColor.addEventListener('input',    e => setVar('--text', e.target.value));
+
+    resetBtn.addEventListener('click', () => {
+      sidebarColor.value = '#2f5b7f';
+      accentColor.value  = '#2f5b7f';
+      textColor.value    = '#1d2430';
+      setVar('--sidebar', sidebarColor.value);
+      setVar('--accent',  accentColor.value);
+      setVar('--text',    textColor.value);
+      capTopColor.value = '#2f5b7f';
+      capBottomColor.value = '#2f5b7f';
+      setVar('--capTop', capTopColor.value);
+      setVar('--capBottom', capBottomColor.value);
+      sidebarColor.value = '#ccd4db';
+      setVar('--sidebar', sidebarColor.value);
+
+
+    });
+
+    // ------------------------------
+// Typography controls (font family / size / line-height / headings)
+// ------------------------------
+    const fontFamily = document.getElementById('fontFamily');
+    const fontSize = document.getElementById('fontSize');
+    const lineHeight = document.getElementById('lineHeight');
+    const headingScale = document.getElementById('headingScale');
+    const resetTypographyBtn = document.getElementById('resetTypographyBtn');
+
+    // defaults (match :root)
+    const DEFAULT_FONT = '"Times New Roman", Times, serif';
+    const DEFAULT_BASE = 14;
+    const DEFAULT_LH = 1.55;
+    const DEFAULT_HEAD_SCALE = 1;
+
+    function setRootVar(name, value){
+    document.documentElement.style.setProperty(name, value);
+    }
+
+    function applyTypography(){
+    // base size + line height
+    const base = Number(fontSize.value || DEFAULT_BASE);
+    const lh = Number(lineHeight.value || DEFAULT_LH);
+
+    setRootVar('--font', fontFamily.value || DEFAULT_FONT);
+    setRootVar('--base', base + 'px');
+    setRootVar('--lh', String(lh));
+
+    // headings scale based on base defaults
+    const hs = Number(headingScale.value || DEFAULT_HEAD_SCALE);
+    setRootVar('--nameSize', (28 * hs) + 'px');
+    setRootVar('--sectionSize', (20 * hs) + 'px');
+    }
+
+    fontFamily.addEventListener('change', applyTypography);
+    fontSize.addEventListener('input', applyTypography);
+    lineHeight.addEventListener('input', applyTypography);
+    headingScale.addEventListener('input', applyTypography);
+
+    resetTypographyBtn.addEventListener('click', () => {
+    fontFamily.value = DEFAULT_FONT;
+    fontSize.value = DEFAULT_BASE;
+    lineHeight.value = DEFAULT_LH;
+    headingScale.value = DEFAULT_HEAD_SCALE;
+    applyTypography();
+    });
+
+    // initialize once
+    applyTypography();
+
+    // ------------------------------
+    // Photo upload (offline preview)
+    // ------------------------------
+    const photoInput = document.getElementById('photoInput');
+    const avatarImg = document.getElementById('avatarImg');
+    const avatarPlaceholder = document.getElementById('avatarPlaceholder');
+    const avatar = document.getElementById('avatar');
+
+    // Clicking the avatar opens file picker
+    avatar.addEventListener('click', () => {
+    photoInput.click();
+    });
+
+    photoInput.addEventListener('change', () => {
+      const file = photoInput.files?.[0];
+      if(!file) return;
+
+      const url = URL.createObjectURL(file);
+      avatarImg.src = url;
+      avatarImg.style.display = 'block';
+      avatarPlaceholder.style.display = 'none';
+    });
+
+    // ------------------------------
+    // Language dots: click to set level
+    // ------------------------------
+    function refreshDots(dotsEl){
+      const level = Number(dotsEl.dataset.level || 0);
+      [...dotsEl.children].forEach((dot, i) => {
+        dot.classList.toggle('on', i < level);
+      });
+    }
+
+    function bindDots(dotsEl){
+      dotsEl.addEventListener('click', (e) => {
+        const dots = [...dotsEl.children];
+        const idx = dots.indexOf(e.target);
+        if(idx === -1) return;
+        dotsEl.dataset.level = String(idx + 1);
+        refreshDots(dotsEl);
+      });
+      refreshDots(dotsEl);
+    }
+
+    document.querySelectorAll('.dots').forEach(bindDots);
+
+    // Add/remove language
+    const languages = document.getElementById('languages');
+    const addLangBtn = document.getElementById('addLangBtn');
+    const removeLangBtn = document.getElementById('removeLangBtn');
+
+    addLangBtn.addEventListener('click', () => {
+      const wrap = document.createElement('div');
+      wrap.className = 'lang';
+      wrap.innerHTML = `
+        <div contenteditable="true">New language</div>
+        <div class="dots" data-level="3" title="click dots to change level">
+          <span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+      `;
+      languages.appendChild(wrap);
+      bindDots(wrap.querySelector('.dots'));
+    });
+
+    removeLangBtn.addEventListener('click', () => {
+      const items = languages.querySelectorAll('.lang');
+      if(items.length > 0) items[items.length - 1].remove();
+    });
+
+    // ------------------------------
+    // Add sections + entries (right side)
+    // ------------------------------
+    const addSectionBtn = document.getElementById('addSectionBtn');
+    const right = document.querySelector('.right');
+
+    function makeEntry(){
+      const entry = document.createElement('article');
+      entry.className = 'entry';
+      entry.setAttribute('data-entry','');
+      entry.innerHTML = `
+        <div class="entryTop">
+          <div class="entryTitle" contenteditable="true">New item title</div>
+          <div class="entryMeta" contenteditable="true">Date / Period</div>
+        </div>
+        <div class="entrySub" contenteditable="true">Organization / Location</div>
+        <div class="entryBody" contenteditable="true">Description (you can use bullets with •)</div>
+      `;
+      return entry;
+    }
+
+    function bindSection(section){
+      const addEntryBtn = section.querySelector('.addEntryBtn');
+      const removeSectionBtn = section.querySelector('.removeSectionBtn');
+      const entries = section.querySelector('.entries');
+
+      addEntryBtn.addEventListener('click', () => {
+        entries.appendChild(makeEntry());
+      });
+
+      removeSectionBtn.addEventListener('click', () => {
+        section.remove();
+      });
+    }
+
+    document.querySelectorAll('[data-section]').forEach(bindSection);
+
+    addSectionBtn.addEventListener('click', () => {
+      const section = document.createElement('section');
+      section.className = 'section';
+      section.setAttribute('data-section','');
+      section.innerHTML = `
+        <div class="sectionHead">
+          <h2 class="sectionTitle" contenteditable="true">New Section</h2>
+          <div class="sectionTools">
+            <button class="mini addEntryBtn no-print">+ Add item</button>
+            <button class="mini removeSectionBtn no-print" title="Remove this section">Remove</button>
+          </div>
+        </div>
+        <div class="entries"></div>
+      `;
+      right.appendChild(section);
+      bindSection(section);
+      // add one default entry
+      section.querySelector('.entries').appendChild(makeEntry());
+    });
+
+    // ------------------------------
+    // Export HTML (save a copy offline)
+    // ------------------------------
+    const exportBtn = document.getElementById('exportBtn');
+
+    exportBtn.addEventListener('click', () => {
+      // Create a downloadable snapshot of the current DOM (client-side).
+      // Note: uploaded photo via objectURL won't embed as base64 automatically.
+      // If you need embedded image, tell me and I will add "embed as base64" option.
+      const html = "<!doctype html>\n" + document.documentElement.outerHTML;
+      const blob = new Blob([html], {type: "text/html;charset=utf-8"});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = "europass_offline_cv.html";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+  </script>
+</body>
+</html>
